@@ -75,8 +75,9 @@
             <thead class="bg-gray-100 text-gray-600 text-sm uppercase">
                 <tr>
                     <th class="px-2 py-4">id</th>
+                    <th class="px-3 py-4">Image</th>
                     <th class="px-3 py-4">Name</th>
-                    <th class="px-4 py-4">Description</th>
+                    <th class="px-2 py-4">Description</th>
                     <th class="px-3 py-4">Price</th>
                     <th class="px-2 py-4">Discounted Price</th>
                     <th class="px-4 py-4">Category</th>
@@ -94,13 +95,18 @@
                             {{ $shirt->id }}
                         </td>
 
-                        <td class="px-4 py-4 font-medium">
+                        <td class="px-3 py-4">
+                            <img src="{{ asset('storage/' . $shirt->image) }}" class="w-22 h-18 object-cover rounded">
+                        </td>
+                        <td class="px-2 py-4 font-medium">
                             {{ $shirt->name }}
                         </td>
 
-                        <td class="px-6 py-4">
+
+                        <td class="px-4 py-4 max-w-[150px] truncate" title="{{ $shirt->description }} ">
                             {{ $shirt->description }}
                         </td>
+
 
                         <td class="px-3 py-4">
                             {{ $shirt->price }}
@@ -125,13 +131,13 @@
                             </span>
                         </td>
 
-                        <td class="px-6 py-4 space-x-2">
+                        <td class="px-6 py-6 flex flex-wrap gap-[5px]">
                             <a href="{{ route('product.edit', $shirt->id) }}" wire:navigate
                                 class="px-3 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200">
                                 Update
                             </a>
                             <a href="{{ route('product.delete', $shirt->id) }}"
-                                class="px-3 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200">
+                                class="px-3  py-1 bg-red-100 text-red-600 rounded hover:bg-red-200">
                                 Delete
                             </a>
                         </td>
@@ -167,7 +173,8 @@
                     <!-- Body -->
                     <div class="px-6 py-6 max-h-[70vh] overflow-y-auto">
 
-                        <form id="createProductForm" action="/product/item/insert" method="post" class="space-y-6">
+                        <form id="createProductForm" action="/product/item/insert" enctype="multipart/form-data"
+                            method="post" class="space-y-6">
                             @csrf
                             <!-- Grid Fields -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -209,6 +216,18 @@
                                     <input type="number"
                                         class="w-full border rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                                         name="stock">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Image</label>
+                                    <input type="file" name="myfile"
+                                        class="block w-full text-sm text-gray-500
+                                                file:mr-4 file:py-2 file:px-4
+                                                file:rounded-xl file:border-0
+                                                file:text-sm file:font-semibold
+                                                file:bg-indigo-50 file:text-indigo-700
+                                                hover:file:bg-indigo-100
+                                                border rounded-xl cursor-pointer focus:outline-none">
+
                                 </div>
 
 

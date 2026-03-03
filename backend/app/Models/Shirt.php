@@ -13,6 +13,7 @@ class Shirt extends Model
         'discount_price',
         'category',
         'in_stock',
+        'image',
     ];
 
     protected $casts = [
