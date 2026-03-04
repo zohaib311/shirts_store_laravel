@@ -33,7 +33,8 @@
             <p class="text-sm text-cyan-100">Keep your catalog details accurate and clear.</p>
         </div>
 
-        <form action="{{ route('product.update', $shirt->id) }}" method="POST" class="space-y-6 p-6">
+        <form action="{{ route('product.update', $shirt->id) }}" method="POST" enctype="multipart/form-data"
+            class="space-y-6 p-6">
             @csrf
 
             <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -79,6 +80,19 @@
                     <input type="number" name="stock" min="0" value="{{ old('stock', $shirt->in_stock) }}"
                         class="w-full rounded-xl border border-slate-300 px-4 py-2.5 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
                         required>
+                </div>
+
+                <div class="flex justify-content-space-between mx-4">
+                    <img class="w-26 mr-4 h-20 object-cover rounded" src="{{ asset('storage/' . $shirt->image) }}"
+                        alt="">
+                    <input type="file" name="myfile"
+                        class="block w-full text-sm text-gray-500
+                                                file:mr-4 file:py-2 file:px-4
+                                                file:rounded-xl file:border-0
+                                                file:text-sm file:font-semibold
+                                                file:bg-indigo-50 file:text-indigo-700
+                                                hover:file:bg-indigo-100
+                                                border rounded-xl cursor-pointer focus:outline-none">
                 </div>
 
                 <div class="md:col-span-2">
