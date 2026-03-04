@@ -1,12 +1,25 @@
 import { useEffect, useMemo, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(
+  /\/+$/,
+  "",
+);
 
 function formatPrice(value) {
   const amount = Number(value);
-  if (Number.isNaN(amount)) return "$0.00";
-  return `$${amount.toFixed(2)}`;
+  if (Number.isNaN(amount)) return "pkr 0.00";
+  return `${amount.toFixed(2)} r.s`;
+}
+
+function resolveImageUrl(product) {
+  const raw = product?.image_url || product?.image;
+  if (!raw || !API_BASE_URL) return "";
+
+  if (/^https?:\/\//i.test(raw)) return raw;
+  if (raw.startsWith("/")) return `${API_BASE_URL}${raw}`;
+
+  return `${API_BASE_URL}/storage/${raw}`;
 }
 
 export default function Shop() {
@@ -28,6 +41,12 @@ export default function Shop() {
         setLoading(true);
         setError("");
 
+        if (!API_BASE_URL) {
+          throw new Error(
+            "VITE_API_BASE_URL is missing. Set it in frontend/.env.",
+          );
+        }
+
         const response = await fetch(`${API_BASE_URL}/api/products`, {
           signal: controller.signal,
           headers: { Accept: "application/json" },
@@ -38,7 +57,14 @@ export default function Shop() {
           throw new Error(payload?.message || "Failed to load products.");
         }
 
-        setProducts(Array.isArray(payload.data) ? payload.data : []);
+        const normalizedProducts = Array.isArray(payload.data)
+          ? payload.data.map((item) => ({
+              ...item,
+              image_url: resolveImageUrl(item),
+            }))
+          : [];
+
+        setProducts(normalizedProducts);
       } catch (err) {
         if (err.name !== "AbortError") {
           setError(err.message || "Failed to load products.");
@@ -53,7 +79,9 @@ export default function Shop() {
   }, []);
 
   const categories = useMemo(() => {
-    const unique = [...new Set(products.map((item) => item.category).filter(Boolean))];
+    const unique = [
+      ...new Set(products.map((item) => item.category).filter(Boolean)),
+    ];
     return ["All", ...unique];
   }, [products]);
 
@@ -68,7 +96,9 @@ export default function Shop() {
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-sm text-indigo-400">Shop Collection</p>
-            <h1 className="text-3xl font-bold md:text-4xl">Find Your Signature Shirt</h1>
+            <h1 className="text-3xl font-bold md:text-4xl">
+              Find Your Signature Shirt
+            </h1>
           </div>
           <div className="flex flex-wrap gap-2">
             {categories.map((category) => (
@@ -105,8 +135,11 @@ export default function Shop() {
         {!loading &&
           !error &&
           filteredProducts.map((product) => (
-            <article key={product.id} className={`${panelClass} overflow-hidden`}>
-              <div className="h-48 bg-gradient-to-br from-indigo-500/35 via-cyan-500/20 to-emerald-400/20 p-4">
+            <article
+              key={product.id}
+              className={`${panelClass} overflow-hidden`}
+            >
+              <div className="h-98 bg-gradient-to-br from-indigo-500/35 via-cyan-500/20 to-emerald-400/20 p-4">
                 {product.image_url ? (
                   <img
                     src={product.image_url}
@@ -132,7 +165,9 @@ export default function Shop() {
                     </p>
                   )}
                 </div>
-                <p className="mt-3 text-sm">{product.description || "No description"}</p>
+                <p className="mt-3 text-sm">
+                  {product.description || "No description"}
+                </p>
                 <div className="mt-5 flex gap-2">
                   <button
                     type="button"
